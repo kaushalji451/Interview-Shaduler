@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 
 const connectMongo = async () => {
-    const MONGODB_URI = "mongodb://127.0.0.1:27017/nextroute"
+    const MONGODB_URI = process.env.MONGODB_URI
   try {
     await mongoose.connect(MONGODB_URI);
     console.log(" MongoDB connected successfully");

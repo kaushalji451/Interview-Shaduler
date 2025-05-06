@@ -25,7 +25,6 @@ export default function Page() {
   const loadInterviews = async (pageToLoad) => {
     const res = await fetch(`/api/hr/interview?page=${pageToLoad}`);
     const data = await res.json();
-    console.log(data);
    
     if (pageToLoad === 1) {
       setInterviews(data.interviews);
@@ -59,13 +58,13 @@ export default function Page() {
 
     const data = await res.json();
     setMsg(data.message);
-    // setForm({
-    //   candidateName: "",
-    //   email: "",
-    //   position: "",
-    //   interviewDate: "",
-    //   interviewer: "",
-    // });
+    setForm({
+      candidateName: "",
+      email: "",
+      position: "",
+      interviewDate: "",
+      interviewer: "",
+    });
     setResume(null);
     loadInterviews(1);
   };
