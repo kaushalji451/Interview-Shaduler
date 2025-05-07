@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
-
+import handelemail from "./components/emailFunc1";
+import handelemailStatusUpdate from "./components/emailFunc2";
 export default function Page() {
   const [form, setForm] = useState({
     candidateName: "",
@@ -57,6 +58,9 @@ export default function Page() {
     });
 
     const data = await res.json();
+    if(data!=null){
+    handelemail(form); //funcition call for the 1 email
+    }
     setMsg(data.message);
     setForm({
       candidateName: "",
@@ -69,16 +73,18 @@ export default function Page() {
     loadInterviews(1);
   };
 
-  const handleStatusChange = async (id, newStatus) => {
+  const handleStatusChange = async (item, newStatus) => {
+    let id = item._id;
     const res = await fetch(`/api/hr/interview`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id, status: newStatus }),
+      body: JSON.stringify({id, status: newStatus }),
     });
-
     const data = await res.json();
     setMsg(data.message);
     loadInterviews(1);
+    // calling the email
+    handelemailStatusUpdate(item);
   };
 
   const deleteOne = async (id) => {
@@ -111,7 +117,6 @@ export default function Page() {
       loadInterviews(1);
     }
   };
-
 
   return (
     <div className="bg-gradient-to-r from-blue-500 to-purple-500">
@@ -215,7 +220,7 @@ export default function Page() {
                   <select
                     defaultValue={item.status}
                     onChange={(e) =>
-                      handleStatusChange(item._id, e.target.value)
+                      handleStatusChange(item, e.target.value)
                     }
                     className="border p-1"
                   >

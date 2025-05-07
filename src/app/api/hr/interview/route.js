@@ -58,7 +58,6 @@ export async function POST(req) {
 
     const buffer = Buffer.from(await file.arrayBuffer());
     const bufferStream = new Readable();
-    // const bufferStream = Readable.from(buffer);//new
     bufferStream.push(buffer);
     bufferStream.push(null);
 
@@ -214,3 +213,4 @@ export async function PUT(req) {
     );
   }
 }
+
