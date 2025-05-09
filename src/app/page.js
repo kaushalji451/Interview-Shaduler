@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import handelemail from "./components/emailFunc1";
 import handelemailStatusUpdate from "./components/emailFunc2";
+import handelemailInterviewer from "./components/emailFunc3";
 export default function Page() {
   const [form, setForm] = useState({
     candidateName: "",
@@ -58,9 +59,13 @@ export default function Page() {
     });
 
     const data = await res.json();
-    if(data!=null){
-    handelemail(form); //funcition call for the 1 email
+    if (data != null) {
+      handelemail(form); //funcition call for the 1 email
     }
+
+    // calling  the interviewer email
+    handleInterviewerEmail(form);
+
     setMsg(data.message);
     setForm({
       candidateName: "",
@@ -78,12 +83,12 @@ export default function Page() {
     const res = await fetch(`/api/hr/interview`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({id, status: newStatus }),
+      body: JSON.stringify({ id, status: newStatus }),
     });
     const data = await res.json();
     setMsg(data.message);
     loadInterviews(1);
-    // calling the email
+    // calling the candidate email
     handelemailStatusUpdate(item);
   };
 
@@ -118,6 +123,29 @@ export default function Page() {
     }
   };
 
+  let handleInterviewerEmail = async (form) => {
+    console.log("got it");
+    handelemailInterviewer(form);
+  };
+
+
+  const [drop, setdrop] = useState(false);
+  let handleDropDown = ()=>{
+   if(drop === false){
+     setdrop(true);
+   }else{
+    setdrop(false);
+   }
+  }
+  let hrArr = [`${process.env.NEXT_PUBLIC_HrHead}`, `${process.env.NEXT_PUBLIC_HrRecruiter}`];
+  let handleAddHr = (hr) => {
+    if (hr === "hrHead") {
+      form.interviewer += hrArr[0] + ",";
+    } else {
+      form.interviewer += hrArr[1] + ",";
+    }
+     setdrop(false);
+  };
   return (
     <div className="bg-gradient-to-r from-blue-500 to-purple-500">
       <div className="max-w-4xl mx-auto p-6 space-y-8">
@@ -159,6 +187,29 @@ export default function Page() {
             required
             className="w-full p-2 border"
           />
+
+          <p onClick={handleDropDown} className="cursor-pointer bg-blue-600 w-fit px-4 py-1 rounded-md text-white">
+            Add Interviewer
+          </p>
+
+        {drop === true && (
+           <div className="flex flex-col gap-2 bg-white w-35 rounded-md  border border-slate-400 pt-2 text-center -mt-4 absolute">
+            <p
+              className=" rounded-md px-2 py-1 cursor-pointer  border-b"
+              onClick={() => handleAddHr("hrHead")}
+            >
+              Add hr Head
+            </p>
+            <p
+              className=" rounded-md px-2 py-1 cursor-pointer  border-b"
+              onClick={() => handleAddHr("hrRecruiter")}
+            >
+              Add hr Recruiter
+            </p>
+          </div>
+        )}
+
+
           <input
             name="interviewer"
             placeholder="Interviewer Names (comma separated)"
@@ -216,52 +267,54 @@ export default function Page() {
                   <strong>Status:</strong>{" "}
                   <span className="text-blue-600">{item.status}</span>
                 </p>
-                <div className="flex items-center gap-2 mt-2">
-                  <select
-                    defaultValue={item.status}
-                    onChange={(e) =>
-                      handleStatusChange(item, e.target.value)
-                    }
-                    className="border p-1"
-                  >
-                    <option value="Pending">Pending</option>
-                    <option value="Scheduled">Scheduled</option>
-                    <option value="Completed">Completed</option>
-                    <option value="Rejected">Rejected</option>
-                  </select>
-                  <button
-                    onClick={() => deleteOne(item._id)}
-                    className="bg-red-600 text-white px-2 py-1 rounded"
-                  >
-                    Delete
-                  </button>
+                <div className="flex items-center max-sm:flex-col gap-2 mt-2">
+                  <div className="flec items-center gap-2 mt-2">
+                    <select
+                      defaultValue={item.status}
+                      onChange={(e) => handleStatusChange(item, e.target.value)}
+                      className="border p-1"
+                    >
+                      <option value="Pending">Pending</option>
+                      <option value="Scheduled">Scheduled</option>
+                      <option value="Completed">Completed</option>
+                      <option value="Rejected">Rejected</option>
+                    </select>
+                    <button
+                      onClick={() => deleteOne(item._id)}
+                      className="bg-red-600 text-white px-2 py-1 rounded"
+                    >
+                      Delete
+                    </button>
+                  </div>
 
                   {/* edit input form */}
-                  {editRes && (
-                    <input
-                      type="file"
-                      required
-                      className="w-full"
-                      onChange={(e) => setResume(e.target.files[0])}
-                    />
-                  )}
-                  {!editRes ? (
-                    <button
-                      className="bg-blue-500 text-white px-2 py-1 rounded"
-                      onClick={handleEdit}
-                    >
-                      Edit
-                    </button>
-                  ) : (
-                    <button
-                      className="bg-blue-500 text-white px-2 py-1 rounded"
-                      onClick={() =>
-                        handleEditSubmit(item._id, item.candidateName)
-                      }
-                    >
-                      Submit
-                    </button>
-                  )}
+                  <div>
+                    {editRes && (
+                      <input
+                        type="file"
+                        required
+                        className="w-full"
+                        onChange={(e) => setResume(e.target.files[0])}
+                      />
+                    )}
+                    {!editRes ? (
+                      <button
+                        className="bg-blue-500 text-white px-2 py-1 rounded"
+                        onClick={handleEdit}
+                      >
+                        Edit
+                      </button>
+                    ) : (
+                      <button
+                        className="bg-blue-500 text-white px-2 py-1 rounded"
+                        onClick={() =>
+                          handleEditSubmit(item._id, item.candidateName)
+                        }
+                      >
+                        Submit
+                      </button>
+                    )}
+                  </div>
                 </div>
                 <div className="flex items-center gap-4 mt-2">
                   <a

@@ -1,3 +1,5 @@
+import handleEmailPostRequest from "./emailpost";
+
 let handelemailStatusUpdate = async (item) => {
   let to = item.email;
   let subject = `Interview Process Update ${item.position} at Niveshjano`;
@@ -16,13 +18,9 @@ Web devloper
 Niveshjano
 
 `;
-  let res = await fetch("http://localhost:3000/email/send", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ to, subject, text }),
-  });
 
-  let data = await res.json();
+    // handle email post request
+    handleEmailPostRequest(to,subject,text);
 };
 
 export default handelemailStatusUpdate;
